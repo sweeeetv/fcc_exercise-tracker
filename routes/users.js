@@ -25,7 +25,12 @@ router.post("/", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const users = await User.find();
-    res.json(users);
+    res.json(
+      users.map((user) => ({
+        username: user.name,
+        _id: user._id,
+      })),
+    );
   } catch (err) {
     console.error("Error fetching users:", err);
     return res.status(500).json({ error: "Failed to fetch users" });
