@@ -1,18 +1,25 @@
-const express = require('express')
-const app = express()
-const cors = require('cors')
-require('dotenv').config()
+require("dotenv").config();
+const mongoose = require("mongoose");
+const createApp = require("./myApp");
+//global variables
+const TIMEOUT = 10000;
+//create app
+const app = createApp();
 
-app.use(cors())
-app.use(express.static('public'))
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/views/index.html')
-});
+//connect to database
+const startServer = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("✅ MongoDB Connected Successfully");
+    //start server after successful database connection
+    const PORT = process.env.PORT || 3000;
+    const listener = app.listen(PORT, "0.0.0.0", () => {
+      console.log("Your app is listening on port " + listener.address().port);
+    });
+  } catch (err) {
+    console.error("❌ Database Connection Failed:", err.message);
+    process.exit(1);
+  }
+};
 
-
-
-
-
-const listener = app.listen(process.env.PORT || 3000, () => {
-  console.log('Your app is listening on port ' + listener.address().port)
-})
+startServer();
